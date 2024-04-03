@@ -1,0 +1,28 @@
+{
+    "id": "CA6B4B91",
+    "path": null,
+    "project_path": null,
+    "type": "object_explorer",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1712139035740.0,
+    "source_on_save": false,
+    "relative_order": 7,
+    "properties": {
+        "id": "fc586b3944e742aeb3011b25c0ee17f9",
+        "name": "trees",
+        "title": "trees",
+        "language": "R",
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 6582866318938092064,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1712139035740,
+    "read_only": false,
+    "read_only_alternatives": []
+}
