@@ -92,3 +92,8 @@ p <- unlist(p)
 p <- matrix(p, ncol = 2, byrow = TRUE)
 plot(p[, 1], p[, 2], xlab = "lambda", ylab = "mu")
 
+# create a bd tree and save it
+t <- completeTrees[[1]][[1]]
+plot(t)
+ape::write.tree(t, file = paste(file.path("trees", "musse" , "musse_tree_"), 0, ".txt", sep=""))
+ape::write.tree(tree_musse_simulations[[i]], file = paste("/trees/musse/musse_tree_", 0, ".nwk", sep=""))
