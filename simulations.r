@@ -373,14 +373,24 @@ if (bd) {
   cat("Average number of extant species in TreeBD trees: ", num_extant_bd, "\n")
   hist(sapply(tree_bd_simulations, function(x) length(x$tip.label)), main = "Number of extant species in TreeBD trees", xlab = "Number of extant species", ylab = "Frequency", plot=TRUE)
   png("hist/tree_bd.png")
+
+  tree_file <- file.path("trees", "bd.nwk")
+  tree_conn <- file(tree_file, "w")
+
+  # Create a file to save all parameters
+  param_file <- file.path("trees", "bd.params")
+  param_conn <- file(param_file, "w")
+
   for (i in 1:length(tree_bd_simulations$trees)) {
+
     t <- tree_bd_simulations$trees[[i]]
-    ape::write.tree(t, file = paste(file.path("trees", "bd" , "bd_"), i, ".nwk", sep=""))
-    # Save the parameters of the tree
+
+    # Save the tree in Newick format to the tree file
+    writeLines(ape::write.tree(t), tree_conn)
+
+    # Save the parameters of the tree to the param file
     params <- tree_bd_simulations$params[[i]]
-    # Write the parameters to a file .params, one line per parameter, specifying the parameter name
-    file_name <- paste(file.path("trees", "bd" , "bd_"), i, ".params", sep="")
-    writeLines(c(paste("lambda ", params[1]), paste("mu ", params[2])), file_name)
+    writeLines(c(paste("lambda ", params[1]), paste("mu ", params[2])), param_conn)
   }
   
 }
@@ -392,15 +402,28 @@ if (bisse){
   start_time <- Sys.time()
   tree_bisse_simulations <- tree_bisse(lambda_range, mu_range, q_range, num_trees)
   end_time <- Sys.time()
+  
+  tree_file <- file.path("trees", "bisse.nwk")
+  tree_conn <- file(tree_file, "w")
+
+  # Create a file to save all parameters
+  param_file <- file.path("trees", "bisse.params")
+  param_conn <- file(param_file, "w")
+
   for (i in 1:length(tree_bisse_simulations$trees)) {
+
     t <- tree_bisse_simulations$trees[[i]]
-    ape::write.tree(t, file = paste(file.path("trees", "bisse" , "bisse_"), i, ".nwk", sep=""))
-    # Save the parameters of the tree
+
+    # Save the tree in Newick format to the tree file
+    writeLines(ape::write.tree(t), tree_conn)
+
+    # Save the parameters of the tree to the param file
     params <- tree_bisse_simulations$params[[i]]
-    # Write the parameters to a file .params, one line per parameter, specifying the parameter name
-    file_name <- paste(file.path("trees", "bisse" , "bisse_"), i, ".params", sep="")
-    writeLines(c(paste("lambda1 ", params[1]), paste("lambda2 ", params[2]), paste("mu1 ", params[3]), paste("mu2 ", params[4]), paste("q12 ", params[5]), paste("q21 ", params[6])), file_name)
+    writeLines(c(paste("lambda1 ", params[1]), paste("lambda2 ", params[2]), paste("mu1 ", params[3]), paste("mu2 ", params[4]), paste("q12 ", params[5]), paste("q21 ", params[6])), param_conn)
   }
+
+
+
   bisse_time <- as.numeric(end_time - start_time, units = "mins")
   cat("Time for BiSSE: ", bisse_time, "\n")
   num_extant_bisse <- mean(sapply(tree_bisse_simulations, function(x) length(x$tip.label)))
@@ -420,16 +443,27 @@ if(musse){
   tree_musse_simulations <- tree_musse(lambda_range, mu_range, q_range, num_states, num_trees)
   # Save the trees in newick format in the folder trees/musse
   end_time <- Sys.time()
+  
+  tree_file <- file.path("trees", "musse.nwk")
+  tree_conn <- file(tree_file, "w")
+
+  # Create a file to save all parameters
+  param_file <- file.path("trees", "musse.params")
+  param_conn <- file(param_file, "w")
+
   for (i in 1:length(tree_musse_simulations$trees)) {
+
     t <- tree_musse_simulations$trees[[i]]
-    ape::write.tree(t, file = paste(file.path("trees", "musse" , "musse_"), i, ".nwk", sep=""))
-    # Save the parameters of the tree
+
+    # Save the tree in Newick format to the tree file
+    writeLines(ape::write.tree(t), tree_conn)
+
+    # Save the parameters of the tree to the param file
     params <- tree_musse_simulations$params[[i]]
-    # Write the parameters to a file .params, one line per parameter, specifying the parameter name
-    file_name <- paste(file.path("trees", "musse" , "musse_"), i, ".params", sep="")
-    writeLines(c(paste("num_states ", num_states), paste("lambda1 ", params[1]), paste("lambda2 ", params[2]), paste("lambda3 ", params[3]), paste("mu1 ", params[4]), paste("mu2 ", params[5]), paste("mu3 ", params[6]), paste("q12 ", params[7]), paste("q13 ", params[8]), paste("q21 ", params[9]), paste("q23 ", params[10]), paste("q31 ", params[11]), paste("q32 ", params[12])), file_name)
-    print(params)
+    writeLines(c(paste("num_states", num_states), paste("lambda1 ", params[1]), paste("lambda2 ", params[2]), paste("lambda3 ", params[3]), paste("mu1 ", params[4]), paste("mu2 ", params[5]), paste("mu3 ", params[6]), paste("q12 ", params[7]), paste("q13 ", params[8]), paste("q21 ", params[9]), paste("q23 ", params[10]), paste("q31 ", params[11]), paste("q32 ", params[12])), param_conn)
   }
+
+
   musse_time <- as.numeric(end_time - start_time, units = "mins")
   cat("Time for MuSSE: ", musse_time, "\n")
   num_extant_musse <- mean(sapply(tree_musse_simulations, function(x) length(x$tip.label)))
@@ -444,16 +478,27 @@ if(geosse){
   start_time <- Sys.time()
   tree_geosse_simulations <- tree_geosse(lambda_range, mu_range, dispersal_range, num_trees)
   end_time <- Sys.time()
+  
+  tree_file <- file.path("trees", "geosse.nwk")
+  tree_conn <- file(tree_file, "w")
+
+  # Create a file to save all parameters
+  param_file <- file.path("trees", "geosse.params")
+  param_conn <- file(param_file, "w")
+
   for (i in 1:length(tree_geosse_simulations$trees)) {
+
     t <- tree_geosse_simulations$trees[[i]]
-    ape::write.tree(t, file = paste(file.path("trees", "geosse" , "geosse_"), i, ".nwk", sep=""))
-    # Save the parameters of the tree
+
+    # Save the tree in Newick format to the tree file
+    writeLines(ape::write.tree(t), tree_conn)
+
+    # Save the parameters of the tree to the param file
     params <- tree_geosse_simulations$params[[i]]
-    # Write the parameters to a file .params, one line per parameter, specifying the parameter name
-    file_name <- paste(file.path("trees", "geosse" , "geosse_"), i, ".params", sep="")
-    writeLines(c(paste("sp_a ", params[1]), paste("sp_b ", params[2]), paste("s_ab ", params[3]), paste("mu_a ", params[4]), paste("mu_b ", params[5]), paste("dispersal_a_to_b ", params[6]), paste("dispersal_b_to_a ", params[7])), file_name)
-    
+    writeLines(c(paste("sp_a ", params[1]), paste("sp_b ", params[2]), paste("s_ab ", params[3]), paste("mu_a ", params[4]), paste("mu_b ", params[5]), paste("dispersal_a_to_b ", params[6]), paste("dispersal_b_to_a ", params[7])), param_conn)
   }
+
+
   geosse_time <- as.numeric(end_time - start_time, units = "mins")
   cat("Time for GeoSSE: ", geosse_time, "\n")
   num_extant_geosse <- mean(sapply(tree_geosse_simulations, function(x) length(x$tip.label)))
@@ -467,16 +512,26 @@ if(bisseness){
   start_time <- Sys.time()
   tree_bisseness_simulations <- tree_bisseness(lambda_range, mu_range, q_range, p_range, num_trees)
   end_time <- Sys.time()
+  
+  tree_file <- file.path("trees", "bisseness.nwk")
+  tree_conn <- file(tree_file, "w")
+
+  # Create a file to save all parameters
+  param_file <- file.path("trees", "bisseness.params")
+  param_conn <- file(param_file, "w")
+
   for (i in 1:length(tree_bisseness_simulations$trees)) {
+
     t <- tree_bisseness_simulations$trees[[i]]
-    ape::write.tree(t, file = paste(file.path("trees", "bisseness" , "bisseness_"), i, ".nwk", sep=""))
-    # Save the parameters of the tree
+
+    # Save the tree in Newick format to the tree file
+    writeLines(ape::write.tree(t), tree_conn)
+
+    # Save the parameters of the tree to the param file
     params <- tree_bisseness_simulations$params[[i]]
-    # Write the parameters to a file .params, one line per parameter, specifying the parameter name
-    file_name <- paste(file.path("trees", "bisseness" , "bisseness_"), i, ".params", sep="")
-    writeLines(c(paste("lambda1 ", params[1]), paste("lambda2 ", params[2]), paste("mu1 ", params[3]), paste("mu2 ", params[4]), paste("q12 ", params[5]), paste("q21 ", params[6]), paste("p0c ", params[7]), paste("p0a ", params[8]), paste("p1c ", params[9]), paste("p1a ", params[10])), file_name)
-    
+    writeLines(c(paste("lambda0 ", params[1]), paste("lambda1 ", params[2]), paste("mu0 ", params[3]), paste("mu1 ", params[4]), paste("q0 ", params[5]), paste("q1 ", params[6]), paste("p0c ", params[7]), paste("p0a ", params[8]), paste("p1c ", params[9]), paste("p1a ", params[10])), param_conn)
   }
+
   bisseness_time <- as.numeric(end_time - start_time, units = "mins")
   cat("Time for BiSSEness: ", bisseness_time, "\n")
   num_extant_bisseness <- mean(sapply(tree_bisseness_simulations, function(x) length(x$tip.label)))
@@ -491,16 +546,27 @@ if(classe){
   start_time <- Sys.time()
   tree_classe_simulations <- tree_classe_2(lambda_range, mu_range, q_range, num_trees)
   end_time <- Sys.time()
+  
+  tree_file <- file.path("trees", "classe.nwk")
+  tree_conn <- file(tree_file, "w")
+
+  # Create a file to save all parameters
+  param_file <- file.path("trees", "classe.params")
+  param_conn <- file(param_file, "w")
+
   for (i in 1:length(tree_classe_simulations$trees)) {
+
     t <- tree_classe_simulations$trees[[i]]
-    ape::write.tree(t, file = paste(file.path("trees", "classe" , "classe_"), i, ".nwk", sep=""))
-    # Save the parameters of the tree
+
+    # Save the tree in Newick format to the tree file
+    writeLines(ape::write.tree(t), tree_conn)
+
+    # Save the parameters of the tree to the param file
     params <- tree_classe_simulations$params[[i]]
-    # Write the parameters to a file .params, one line per parameter, specifying the parameter name
-    file_name <- paste(file.path("trees", "classe" , "classe_"), i, ".params", sep="")
-    writeLines(c(paste("num_states ", 2), paste("lambda111 ", params[1]), paste("lambda112 ", params[2]), paste("lambda122 ", params[3]), paste("lambda211 ", params[4]), paste("lambda212 ", params[5]), paste("lambda222 ", params[6]), paste("mu1 ", params[7]), paste("mu2 ", params[8]), paste("q12 ", params[9]), paste("q21 ", params[10])), file_name)
-    
+    writeLines(c(paste("num_states", num_states), paste("lambda111 ", params[1]), paste("lambda112 ", params[2]), paste("lambda122 ", params[3]), paste("lambda211 ", params[4]), paste("lambda212 ", params[5]), paste("lambda222 ", params[6]), paste("mu1 ", params[7]), paste("mu2 ", params[8]), paste("q12 ", params[9]), paste("q21 ", params[10])), param_conn)
   }
+
+
   classe_time <- as.numeric(end_time - start_time, units = "mins")
   cat("Time for ClaSSE: ", quasse_time, "\n")
   num_extant_classe <- mean(sapply(tree_classe_simulations, function(x) length(x$tip.label)))
@@ -515,16 +581,26 @@ if(quasse){
   start_time <- Sys.time()
   tree_quasse_simulations <- tree_quasse(lambda_range, mu_range, T_max, num_trees)
   end_time <- Sys.time()
+
+  tree_file <- file.path("trees", "quasse.nwk")
+  tree_conn <- file(tree_file, "w")
+
+  # Create a file to save all parameters
+  param_file <- file.path("trees", "quasse.params")
+  param_conn <- file(param_file, "w")
+
   for (i in 1:length(tree_quasse_simulations$trees)) {
+
     t <- tree_quasse_simulations$trees[[i]]
-    ape::write.tree(t, file = paste(file.path("trees", "quasse" , "quasse_"), i, ".nwk", sep=""))
-    # Save the parameters of the tree
+
+    # Save the tree in Newick format to the tree file
+    writeLines(ape::write.tree(t), tree_conn)
+
+    # Save the parameters of the tree to the param file
     params <- tree_quasse_simulations$params[[i]]
-    # Write the parameters to a file .params, one line per parameter, specifying the parameter name
-    file_name <- paste(file.path("trees", "quasse" , "quasse_"), i, ".params", sep="")
-    writeLines(c(paste("function(lambda) ", params[1]), paste("function(mu) ", params[2]), paste("char ", params[3])), file_name)
-    
+    writeLines(c(paste("lambda ", params[1]), paste("mu ", params[2])), param_conn)
   }
+
   # save time, specifying if seconds, minutes, hours, etc.
   quasse_time <- as.numeric(end_time - start_time, units = "mins")
   cat("Time for QuaSSE: ", quasse_time, "\n")
