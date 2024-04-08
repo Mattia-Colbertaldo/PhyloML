@@ -1,3 +1,6 @@
-function(lambda) =  0.926225030515343
-function(mu) =  0.511413931846619
-char =  NA
+function(lambda) =  function (x) 
+sigmoid.x(x, y[1], y[2], xmid, r)
+function(mu) =  function (x) 
+constant.x(x, c)
+char =  function (x, dt) 
+x + rnorm(length(x), drift * dt, sqrt(dt * diffusion))

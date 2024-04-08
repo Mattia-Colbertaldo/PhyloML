@@ -1,3 +1,6 @@
-function(lambda) =  0.552853773790412
-function(mu) =  0.179989006835967
-char =  NA
+function(lambda) =  function (x) 
+stepf.x(x, y[1], y[2], xmid)
+function(mu) =  function (x) 
+constant.x(x, c)
+char =  function (x, dt) 
+x + rnorm(length(x), drift * dt, sqrt(dt * diffusion))
