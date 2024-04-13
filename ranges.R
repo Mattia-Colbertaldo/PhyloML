@@ -24,6 +24,10 @@ completeTrees <- FamilyAllTrees[completeTreesIndices]
 completeTreesIndices
 plot(completeTrees[[2]][[1]])
 
+# get the minimum and maximum number of species in the complete trees
+min(sapply(completeTrees, function(x) length(x[[1]]$tip.label)))
+max(sapply(completeTrees, function(x) length(x[[1]]$tip.label)))
+
 # save the complete trees
 save(completeTrees, file = "data/completeTrees.Rdata")
 

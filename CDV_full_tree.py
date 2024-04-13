@@ -1,21 +1,22 @@
-#!/usr/bin/env python3
-
 import sys
 import pandas as pd
 import numpy as np
 import argparse
 import random
-
 from ete3 import Tree
 
-max_len = 501
+#!/usr/bin/env python3
+
+
+
+max_len = 1001
 
 TURN_ONE = 'turn_one'
 
 
 DIVERSIFICATION_SCORE = 'diversification_score'
 
-sys.setrecursionlimit(100000)
+sys.setrecursionlimit(10000000)
 
 
 def get_average_branch_length(tre):
@@ -140,7 +141,7 @@ def follow_signs(anc):
     return end_leaf
 
 
-def enc_diver(anc):
+"""def enc_diver(anc):
     leaf = follow_signs(anc)
     setattr(leaf, 'visited', True)
     anc = get_not_visited_anc(leaf)
@@ -150,7 +151,21 @@ def enc_diver(anc):
     setattr(anc, 'visited', True)
     yield get_dist_to_root(anc)
     for _ in enc_diver(anc):
-        yield _
+        yield _"""
+        
+def enc_diver(anc):
+    stack = [anc]
+    while stack:
+        anc = stack[-1]
+        leaf = follow_signs(anc)
+        setattr(leaf, 'visited', True)
+        anc = get_not_visited_anc(leaf)
+        if anc is None:
+            stack.pop()
+        else:
+            setattr(anc, 'visited', True)
+            yield get_dist_to_root(anc)
+            stack.append(anc)
 
 
 def complete_coding(encoding, max_length):
@@ -173,42 +188,46 @@ if __name__ == '__main__':
 
     # encode tree by tree
     for i in range(0, len(trees)):
-
+        
         if len(trees[i]) > 0:
-            tree = Tree(trees[i] + ";", format=1)
-            name_tree(tree)
+            try:
+                tree = Tree(trees[i] + ";", format=1)
+                name_tree(tree)
 
-            # rescale tree to average branch length of 1
-            # measure average branch length
-            rescale_factor = get_average_branch_length(tree)
-            # rescale tree
-            rescale_tree(tree, rescale_factor)
+                # rescale tree to average branch length of 1
+                # measure average branch length
+                rescale_factor = get_average_branch_length(tree)
+                # rescale tree
+                rescale_tree(tree, rescale_factor)
 
-            # add dist to root attribute
-            tree, tr_height = add_dist_to_root(tree)
+                # add dist to root attribute
+                tree, tr_height = add_dist_to_root(tree)
 
-            # add pathway of visiting priorities for encoding
-            add_diversification(tree)
-            add_diversification_sign(tree)
+                # add pathway of visiting priorities for encoding
+                add_diversification(tree)
+                add_diversification_sign(tree)
 
-            # encode the tree
-            tree_embedding = list(enc_diver(tree))
+                # encode the tree
+                tree_embedding = list(enc_diver(tree))
 
-            # add tree height
-            tree_embedding.insert(0, tr_height)
+                # add tree height
+                tree_embedding.insert(0, tr_height)
 
-            # complete embedding
-            tree_embedding = complete_coding(tree_embedding, max_len)
+                # complete embedding
+                tree_embedding = complete_coding(tree_embedding, max_len)
 
-            # add type count and scaling factor
-            tree_embedding.extend([rescale_factor])
+                # add type count and scaling factor
+                tree_embedding.extend([rescale_factor])
 
-            line_DF = pd.DataFrame(tree_embedding, columns=[i])
+                line_DF = pd.DataFrame(tree_embedding, columns=[i])
 
-            if i == 0:
-                result = line_DF
-            else:
-                result = pd.concat([result, line_DF], axis=1)
+                if i == 0:
+                    result = line_DF
+                else:
+                    result = pd.concat([result, line_DF], axis=1)
+            except RecursionError:
+                sys.stdout.write("Recursion limit exceeded. Please increase the recursion limit or optimize the code.")
+                sys.exit(1)
 
     result = result.T
 
