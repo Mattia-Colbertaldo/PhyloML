@@ -16,7 +16,7 @@ TURN_ONE = 'turn_one'
 
 DIVERSIFICATION_SCORE = 'diversification_score'
 
-sys.setrecursionlimit(10000000)
+sys.setrecursionlimit(1000000000)
 
 
 def get_average_branch_length(tre):
@@ -180,55 +180,41 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--tree', type=str, help='name of the file with nwk trees')
     args = parser.parse_args()
 
-    # read nwk file with trees
+    # Read nwk file with trees
     tree = str(args.tree)
     file = open(tree, mode="r")
     forest = file.read().replace("\n", "")
-    trees = forest.split(";") # split to individual trees
+    trees = forest.split(";")  # split to individual trees
 
-    # encode tree by tree
-    for i in range(0, len(trees)):
-        
-        if len(trees[i]) > 0:
-            try:
-                tree = Tree(trees[i] + ";", format=1)
-                name_tree(tree)
+    # Encode tree by tree
+    with open('trees/musse.csv', 'w') as f:  # Open the CSV file
+        for i in range(0, len(trees)):
+            sys.stdout.write("\r" + "Processing tree " + str(i) + " of " + str(len(trees)))
+            sys.stdout.flush()
+            if len(trees[i]) > 0:
+                try:
+                    tree = Tree(trees[i] + ";", format=1)
+                    name_tree(tree)
+                    rescale_factor = get_average_branch_length(tree)
+                    rescale_tree(tree, rescale_factor)
+                    tree, tr_height = add_dist_to_root(tree)
+                    add_diversification(tree)
+                    add_diversification_sign(tree)
+                    tree_embedding = list(enc_diver(tree))
+                    tree_embedding.insert(0, tr_height)
+                    tree_embedding = complete_coding(tree_embedding, max_len)
+                    tree_embedding.extend([rescale_factor])
+                    line_DF = pd.DataFrame(tree_embedding, columns=[i]).T  # Transpose the DataFrame
+                    # Write the line to the CSV file
+                    f.write(line_DF.to_csv(sep='\t', index=True, index_label='Index', header=False))
+                except RecursionError:
+                    sys.stdout.write("Recursion limit exceeded. Please increase the recursion limit or optimize the code.")
+                    sys.exit(1)
 
-                # rescale tree to average branch length of 1
-                # measure average branch length
-                rescale_factor = get_average_branch_length(tree)
-                # rescale tree
-                rescale_tree(tree, rescale_factor)
+    #result = result.T
 
-                # add dist to root attribute
-                tree, tr_height = add_dist_to_root(tree)
 
-                # add pathway of visiting priorities for encoding
-                add_diversification(tree)
-                add_diversification_sign(tree)
-
-                # encode the tree
-                tree_embedding = list(enc_diver(tree))
-
-                # add tree height
-                tree_embedding.insert(0, tr_height)
-
-                # complete embedding
-                tree_embedding = complete_coding(tree_embedding, max_len)
-
-                # add type count and scaling factor
-                tree_embedding.extend([rescale_factor])
-
-                line_DF = pd.DataFrame(tree_embedding, columns=[i])
-
-                if i == 0:
-                    result = line_DF
-                else:
-                    result = pd.concat([result, line_DF], axis=1)
-            except RecursionError:
-                sys.stdout.write("Recursion limit exceeded. Please increase the recursion limit or optimize the code.")
-                sys.exit(1)
-
-    result = result.T
-
-    sys.stdout.write(result.to_csv(sep='\t', index=True, index_label='Index'))
+    # write the result to csv trees/musse.csv
+    #with open('trees/musse.csv', 'w') as f:
+        #f.write(result.to_csv(sep='\t', index=True, index_label='Index'))
+    #sys.stdout.write(result.to_csv(sep='\t', index=True, index_label='Index'))
