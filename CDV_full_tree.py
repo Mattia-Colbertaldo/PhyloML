@@ -178,6 +178,7 @@ def complete_coding(encoding, max_length):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Encodes tree into full tree representation. Call script from terminal with: python3 CDV_full_tree.py -t ./filename.nwk >> encoded_full_tree.csv')
     parser.add_argument('-t', '--tree', type=str, help='name of the file with nwk trees')
+    parser.add_argument('-f', '--file', type=str, help='File path')
     args = parser.parse_args()
 
     # Read nwk file with trees
@@ -187,7 +188,10 @@ if __name__ == '__main__':
     trees = forest.split(";")  # split to individual trees
 
     # Encode tree by tree
-    with open('trees/musse.csv', 'w') as f:  # Open the CSV file
+    
+    file_path = args.file
+    
+    with open(file_path, 'w') as f:  # Open the CSV file
         for i in range(0, len(trees)):
             sys.stdout.write("\r" + "Processing tree " + str(i) + " of " + str(len(trees)))
             sys.stdout.flush()

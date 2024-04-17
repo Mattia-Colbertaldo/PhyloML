@@ -4,6 +4,15 @@ library(diversitree)
 
 ### PARAMETERS ###
 
+
+bd <- FALSE
+bisse <- TRUE
+musse <- FALSE
+geosse <- TRUE
+bisseness <- TRUE
+classe <- TRUE
+quasse <- TRUE
+
 step <- 0.1
 lambda_range <- c(0.1, 0.73)
 mu_range <- c(0, 0.75)
@@ -13,7 +22,7 @@ r_range <- c(0.5, 1.0)
 p_range <- c(0.1, 0.9) # bisseness
 
 num_trees <- 10**3
-name <- "10k"
+name <- "1k"
 T_max <- Inf
 max_taxa <- 1000
 
@@ -30,7 +39,8 @@ tree_bd <- function(lambda, mu, num_trees) {
   n_sp <- list()
   j <- 0
   params <- list()
-  param_conn <- file("trees/bd.params", "a")
+  param_conn <- file("trees/bd.params", "w")
+  sizes_conn <- file("trees/bd.sizes", "w")
   for (i in 1:num_trees) {
     l <- runif(1, lambda)
     m <- runif(1, mu)
@@ -44,6 +54,7 @@ tree_bd <- function(lambda, mu, num_trees) {
         params[[length(params) + 1]] <- c(l, m)
 
         ape::write.tree(phy, file = "trees/bd.nwk", append = TRUE)
+        writeLines(paste(length(phy$tip.label)), sizes_conn)
 
         par <- params[[length(params)]]
         param_lines <- c(
@@ -51,6 +62,10 @@ tree_bd <- function(lambda, mu, num_trees) {
           paste("mu ", par[2])
         )
         writeLines(param_lines, param_conn)
+
+        # print number of trees in the two files
+        cat("Length of nwk", length(trees))
+        cat("Length of params", length(params))
 
       }
       cat(" Number of extant species: ", length(phy$tip.label))
@@ -74,6 +89,10 @@ tree_bd <- function(lambda, mu, num_trees) {
   hist(sapply(trees, function(x) length(x$tip.label)), main = "Number of extant species in BD trees", xlab = "Number of extant species", ylab = "Frequency", plot=TRUE)
 
   close(param_conn)
+  close(sizes_conn)
+
+  cat("Number of trees: ", length(trees), "\n")
+  cat("Number of parameters: ", length(params), "\n")
   return(list(trees=trees, params=params))
 }
 
@@ -84,7 +103,8 @@ tree_bisse <- function(lambda_range, mu_range, q_range, num_trees) {
   trees <- list()
   j <- 0
   params <- list()
-  param_conn <- file("trees/bisse.params", "a")
+  param_conn <- file("trees/bisse.params", "w")
+  sizes_conn <- file("trees/bisse.sizes", "w")
   for (i in 1:num_trees) {
     lambdas <- runif(2,lambda_range[1], lambda_range[2])
     mus <- runif(2,mu_range[1], mu_range[2])
@@ -99,6 +119,7 @@ tree_bisse <- function(lambda_range, mu_range, q_range, num_trees) {
       params[[length(params) + 1]] <- c(lambdas, mus, qs)
 
       ape::write.tree(phy, file = "trees/bisse.nwk", append = TRUE)
+      writeLines(paste(length(phy$tip.label)), sizes_conn)
 
       par <- params[[length(params)]]
       param_lines <- c(
@@ -115,6 +136,7 @@ tree_bisse <- function(lambda_range, mu_range, q_range, num_trees) {
     
   }
   close(param_conn)
+  close(sizes_conn)
   return(list(trees=trees, params=params))
 }
 
@@ -132,8 +154,8 @@ tree_musse <- function(lambda_range, mu_range, q_range, num_states, num_trees) {
   trees <- list()
   j <- 0
   params <- list()
-  param_conn <- file("trees/musse_500k.params", "a")
-
+  param_conn <- file("trees/musse_500k.params", "w")
+  sizes_conn <- file("trees/musse_500k.sizes", "w")
   for(i in 1:num_trees) {
     lambdas <- runif(num_states, lambda_range[1], lambda_range[2])
     # sample mu from a uniform distribution between the mu_range[1] and the corresponding lambda
@@ -153,6 +175,7 @@ tree_musse <- function(lambda_range, mu_range, q_range, num_states, num_trees) {
       params[[length(params) + 1]] <- c(lambdas, mus, qs)
 
       ape::write.tree(phy, file = "trees/musse_500k.nwk", append = TRUE)
+      writeLines(paste(length(phy$tip.label)), sizes_conn)
 
       par <- params[[length(params)]]
       param_lines <- c(
@@ -181,6 +204,7 @@ tree_musse <- function(lambda_range, mu_range, q_range, num_states, num_trees) {
   }
 
   close(param_conn)
+  close(sizes_conn)
 
   return(list(trees=trees, params=params))
 
@@ -194,7 +218,8 @@ tree_geosse <- function(lambda_range, mu_range, dispersal_range, num_trees) {
   trees <- list()
   j <- 0
   params <- list()
-  param_conn <- file("trees/geosse.params", "a")
+  param_conn <- file("trees/geosse.params", "w")
+  sizes_conn <- file("trees/geosse.sizes", "w")
   for(i in 1:num_trees) {
     cat("GeoSSE [", j, "/", num_trees, "]")
     sp_a <- runif(1,lambda_range)
@@ -215,6 +240,7 @@ tree_geosse <- function(lambda_range, mu_range, dispersal_range, num_trees) {
       params[[length(params) + 1]] <- c(sp_a, sp_b, s_ab, mu_a, mu_b, dispersal_a_to_b, dispersal_b_to_a)
 
       ape::write.tree(phy, file = "trees/geosse.nwk", append = TRUE)
+      writeLines(paste(length(phy$tip.label)), sizes_conn)
 
       par <- params[[length(params)]]
       param_lines <- c(
@@ -231,6 +257,7 @@ tree_geosse <- function(lambda_range, mu_range, dispersal_range, num_trees) {
     j <- j+1
   }
   close(param_conn)
+  close(sizes_conn)
   return(list(trees=trees, params=params))
 
 }
@@ -249,7 +276,8 @@ tree_bisseness <- function(lambda_range, mu_range, q_range, p_range, num_trees){
   trees <- list()
   j <- 0
   params <- list()
-  param_conn <- file("trees/bisseness.params", "a")
+  param_conn <- file("trees/bisseness.params", "w")
+  sizes_conn <- file("trees/bisseness.sizes", "w")
   for(i in 1:num_trees) {
     cat("BiSSEness [", j, "/", num_trees, "]\n")
     lambdas <- runif(2, min = lambda_range[1], max = lambda_range[2])
@@ -267,6 +295,7 @@ tree_bisseness <- function(lambda_range, mu_range, q_range, p_range, num_trees){
       params[[length(params) + 1]] <- c(lambdas, mus, qs, ps)
 
       ape::write.tree(phy, file = "trees/bisseness.nwk", append = TRUE)
+      writeLines(paste(length(phy$tip.label)), sizes_conn)
 
       par <- params[[length(params)]]
       param_lines <- c(
@@ -286,6 +315,7 @@ tree_bisseness <- function(lambda_range, mu_range, q_range, p_range, num_trees){
     j <- j+1
   }
   close(param_conn)
+  close(sizes_conn)
   return(list(trees=trees, params=params))
 }
 
@@ -296,7 +326,8 @@ tree_classe_2 <- function(lambda_range, mu_range, q_range, num_trees) {
   trees <- list()
   j <- 0
   params <- list()
-  param_conn <- file("trees/classe_2.params", "a")
+  param_conn <- file("trees/classe_2.params", "w")
+  sizes_conn <- file("trees/classe_2.sizes", "w")
   for(i in 1:num_trees) {
     lambdas <- runif(6,lambda_range[1], lambda_range[2])
     mus <- runif(2,mu_range[1], mu_range[2])
@@ -311,6 +342,7 @@ tree_classe_2 <- function(lambda_range, mu_range, q_range, num_trees) {
       params[[length(params) + 1]] <- c(lambdas, mus, qs)
 
       ape::write.tree(phy, file = "trees/classe_2.nwk", append = TRUE)
+      writeLines(paste(length(phy$tip.label)), sizes_conn)
 
       par <- params[[length(params)]]
       param_lines <- c(
@@ -331,6 +363,7 @@ tree_classe_2 <- function(lambda_range, mu_range, q_range, num_trees) {
     j <- j+1
   }
   close(param_conn)
+  close(sizes_conn)
   return(list(trees=trees, params=params))
 }
 
@@ -344,7 +377,8 @@ tree_quasse <- function(lambda_range, mu_range, T_max, num_trees) {
   trees <- list()
   j <- 0
   params <- list()
-  param_conn <- file("trees/quasse.params", "a")
+  param_conn <- file("trees/quasse.params", "w")
+  sizes_conn <- file("trees/quasse.sizes", "w")
   for(i in 1:num_trees) {
     # randomly select lambda and mu functions from a list of possible functions: sigmoid, constant, linear, etc.
     functions <- c( "sigmoid", 
@@ -439,6 +473,7 @@ tree_quasse <- function(lambda_range, mu_range, T_max, num_trees) {
       params[[length(params) + 1]] <- c(lambda, mu, char)
 
       ape::write.tree(phy, file = "trees/quasse.nwk", append = TRUE)
+      writeLines(paste(length(phy$tip.label)), sizes_conn)
 
       par <- params[[length(params)]]
       param_lines <- c(
@@ -453,6 +488,7 @@ tree_quasse <- function(lambda_range, mu_range, T_max, num_trees) {
     cat(" Species: ", phy$tip.label, "\n")
   }
   close(param_conn)
+  close(sizes_conn)
   return(list(trees=trees, params=params))
 }
 
@@ -523,7 +559,6 @@ get_ranges <- function() {
 
 ### BD ###
 
-bd = FALSE
 if (bd) {
   start_time <- Sys.time()
   tree_bd_simulations <- tree_bd(lambda_range, mu_range, num_trees)
@@ -540,7 +575,6 @@ if (bd) {
 
 ### BiSSE ###
 
-bisse = FALSE
 if (bisse){
   start_time <- Sys.time()
   tree_bisse_simulations <- tree_bisse(lambda_range, mu_range, q_range, num_trees)
@@ -558,7 +592,6 @@ if (bisse){
 
 ### MUSSE ###
 
-musse = TRUE
 if(musse){
   num_states <- 3
   start_time <- Sys.time()
@@ -596,7 +629,6 @@ if(musse & !bd & !bisse & !geosse & !bisseness & !classe & !quasse){
 
 
 ### GeoSSE ###
-geosse = FALSE
 if(geosse){
   start_time <- Sys.time()
   tree_geosse_simulations <- tree_geosse(lambda_range, mu_range, dispersal_range, num_trees)
@@ -625,7 +657,6 @@ if(bisseness){
 }
 
 ### ClaSSE ###
-classe = FALSE
 if(classe){
   start_time <- Sys.time()
   tree_classe_simulations <- tree_classe_2(lambda_range, mu_range, q_range, num_trees)
@@ -640,7 +671,6 @@ if(classe){
 }
 
 ### QuaSSE ###
-quasse = FALSE
 if(quasse){
   start_time <- Sys.time()
   tree_quasse_simulations <- tree_quasse(lambda_range, mu_range, T_max, num_trees)
