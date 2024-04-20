@@ -32,6 +32,7 @@ The main purpose of this thesis work is to substitute the slow Maximum Likelihoo
 ## Models
 
 We explore various models for simulating phylogenetic trees, including:
+- BD
 - BiSSE
 - MuSSE
 - QuaSSE
