@@ -5,13 +5,13 @@ library(diversitree)
 ### PARAMETERS ###
 
 
-bd <- FALSE
+bd <- TRUE
 bisse <- TRUE
 musse <- FALSE
 geosse <- TRUE
-bisseness <- TRUE
+bisseness <- FALSE
 classe <- TRUE
-quasse <- TRUE
+quasse <- FALSE
 
 step <- 0.1
 lambda_range <- c(0.1, 0.73)
@@ -21,7 +21,7 @@ dispersal_range <- c(0.1, 0.9)
 r_range <- c(0.5, 1.0)
 p_range <- c(0.1, 0.9) # bisseness
 
-num_trees <- 10**3
+num_trees <- 10**4
 name <- "1k"
 T_max <- Inf
 max_taxa <- 1000
@@ -39,8 +39,8 @@ tree_bd <- function(lambda, mu, num_trees) {
   n_sp <- list()
   j <- 0
   params <- list()
-  param_conn <- file("trees/bd.params", "w")
-  sizes_conn <- file("trees/bd.sizes", "w")
+  param_conn <- file("trees/bd.params", "a")
+  sizes_conn <- file("trees/bd.sizes", "a")
   for (i in 1:num_trees) {
     l <- runif(1, lambda)
     m <- runif(1, mu)
@@ -103,8 +103,8 @@ tree_bisse <- function(lambda_range, mu_range, q_range, num_trees) {
   trees <- list()
   j <- 0
   params <- list()
-  param_conn <- file("trees/bisse.params", "w")
-  sizes_conn <- file("trees/bisse.sizes", "w")
+  param_conn <- file("trees/bisse.params", "a")
+  sizes_conn <- file("trees/bisse.sizes", "a")
   for (i in 1:num_trees) {
     lambdas <- runif(2,lambda_range[1], lambda_range[2])
     mus <- runif(2,mu_range[1], mu_range[2])
@@ -154,8 +154,8 @@ tree_musse <- function(lambda_range, mu_range, q_range, num_states, num_trees) {
   trees <- list()
   j <- 0
   params <- list()
-  param_conn <- file("trees/musse_500k.params", "w")
-  sizes_conn <- file("trees/musse_500k.sizes", "w")
+  param_conn <- file("trees/musse_500k.params", "a")
+  sizes_conn <- file("trees/musse_500k.sizes", "a")
   for(i in 1:num_trees) {
     lambdas <- runif(num_states, lambda_range[1], lambda_range[2])
     # sample mu from a uniform distribution between the mu_range[1] and the corresponding lambda
@@ -218,8 +218,8 @@ tree_geosse <- function(lambda_range, mu_range, dispersal_range, num_trees) {
   trees <- list()
   j <- 0
   params <- list()
-  param_conn <- file("trees/geosse.params", "w")
-  sizes_conn <- file("trees/geosse.sizes", "w")
+  param_conn <- file("trees/geosse.params", "a")
+  sizes_conn <- file("trees/geosse.sizes", "a")
   for(i in 1:num_trees) {
     cat("GeoSSE [", j, "/", num_trees, "]")
     sp_a <- runif(1,lambda_range)
@@ -263,7 +263,7 @@ tree_geosse <- function(lambda_range, mu_range, dispersal_range, num_trees) {
 }
 
 
-
+### BiSSEness ###
 
 #Parameters:
 #• λ0, λ1: Base speciation rates irrespective of character states.
@@ -276,8 +276,8 @@ tree_bisseness <- function(lambda_range, mu_range, q_range, p_range, num_trees){
   trees <- list()
   j <- 0
   params <- list()
-  param_conn <- file("trees/bisseness.params", "w")
-  sizes_conn <- file("trees/bisseness.sizes", "w")
+  param_conn <- file("trees/bisseness.params", "a")
+  sizes_conn <- file("trees/bisseness.sizes", "a")
   for(i in 1:num_trees) {
     cat("BiSSEness [", j, "/", num_trees, "]\n")
     lambdas <- runif(2, min = lambda_range[1], max = lambda_range[2])
@@ -299,16 +299,16 @@ tree_bisseness <- function(lambda_range, mu_range, q_range, p_range, num_trees){
 
       par <- params[[length(params)]]
       param_lines <- c(
-        paste("lambda0 ", par[1]),
-        paste("lambda1 ", par[2]),
-        paste("mu0 ", par[3]),
-        paste("mu1 ", par[4]),
-        paste("q0 ", par[5]),
-        paste("q1 ", par[6]),
-        paste("p0c ", par[7]),
-        paste("p0a ", par[8]),
-        paste("p1c ", par[9]),
-        paste("p1a ", par[10])
+        paste("lambda1 ", par[1]),
+        paste("lambda2 ", par[2]),
+        paste("mu1 ", par[3]),
+        paste("mu2 ", par[4]),
+        paste("q1 ", par[5]),
+        paste("q2 ", par[6]),
+        paste("p1c ", par[7]),
+        paste("p1a ", par[8]),
+        paste("p2c ", par[9]),
+        paste("p2a ", par[10])
       )
       writeLines(param_lines, param_conn)
     }
@@ -326,8 +326,8 @@ tree_classe_2 <- function(lambda_range, mu_range, q_range, num_trees) {
   trees <- list()
   j <- 0
   params <- list()
-  param_conn <- file("trees/classe_2.params", "w")
-  sizes_conn <- file("trees/classe_2.sizes", "w")
+  param_conn <- file("trees/classe_2.params", "a")
+  sizes_conn <- file("trees/classe_2.sizes", "a")
   for(i in 1:num_trees) {
     lambdas <- runif(6,lambda_range[1], lambda_range[2])
     mus <- runif(2,mu_range[1], mu_range[2])
@@ -377,8 +377,8 @@ tree_quasse <- function(lambda_range, mu_range, T_max, num_trees) {
   trees <- list()
   j <- 0
   params <- list()
-  param_conn <- file("trees/quasse.params", "w")
-  sizes_conn <- file("trees/quasse.sizes", "w")
+  param_conn <- file("trees/quasse.params", "a")
+  sizes_conn <- file("trees/quasse.sizes", "a")
   for(i in 1:num_trees) {
     # randomly select lambda and mu functions from a list of possible functions: sigmoid, constant, linear, etc.
     functions <- c( "sigmoid", 
@@ -642,7 +642,6 @@ if(geosse){
   png("hist/tree_geosse.png")
 }
 ### BiSSEness ###
-bisseness = FALSE
 if(bisseness){
   start_time <- Sys.time()
   tree_bisseness_simulations <- tree_bisseness(lambda_range, mu_range, q_range, p_range, num_trees)
