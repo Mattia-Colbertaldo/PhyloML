@@ -5,13 +5,13 @@ library(diversitree)
 ### PARAMETERS ###
 
 
-bd <- TRUE
-bisse <- TRUE
+bd <- FALSE
+bisse <- FALSE
 musse <- FALSE
-geosse <- TRUE
+geosse <- FALSE
 bisseness <- FALSE
-classe <- TRUE
-quasse <- FALSE
+classe <- FALSE
+quasse <- TRUE
 
 step <- 0.1
 lambda_range <- c(0.1, 0.73)
@@ -21,8 +21,8 @@ dispersal_range <- c(0.1, 0.9)
 r_range <- c(0.5, 1.0)
 p_range <- c(0.1, 0.9) # bisseness
 
-num_trees <- 10**4
-name <- "1k"
+num_trees <- 15*10**3
+name <- "15k"
 T_max <- Inf
 max_taxa <- 1000
 
@@ -568,8 +568,9 @@ if (bd) {
   num_extant_bd <- mean(sapply(tree_bd_simulations$trees, function(x) length(x$tip.label)))
   cat("Average number of extant species in TreeBD trees: ", num_extant_bd, "\n")
   cat("Number of extant species in TreeBD trees: ", num_extant_bd, "\n")
-  hist(sapply(tree_bd_simulations$trees, function(x) length(x$tip.label)), main = "Number of extant species in TreeBD trees", xlab = "Number of extant species", ylab = "Frequency", plot=TRUE)
-  png("hist/tree_bd.png")  
+  hist(sapply(tree_bd_simulations$trees, function(x) length(x$tip.label)), main = "Number of extant species in BD trees", xlab = "Number of extant species", ylab = "Frequency", plot=TRUE, save.image("hist/tree_bd.png"))
+  png("hist/tree_bd.png")
+  dev.off()
   
 }
 

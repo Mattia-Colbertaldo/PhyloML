@@ -44,7 +44,7 @@ coef(fit)
 load("data/completeTrees.Rdata")
 pars <- list()
 threshold <- 0
-cat("Running BD model\n")
+cat("Running bisseness model\n")
 for (tree in completeTrees) {
     t <- tree[[1]]
     # if the tree is not ultrametric, we need to make it ultrametric
@@ -53,8 +53,8 @@ for (tree in completeTrees) {
     }
     tryCatch(
         {
-            lik <- make.bd(t)
-            p <- starting.point.bd(t)
+            lik <- make.bisseness(t)
+            p <- starting.point.bisseness(t)
             fit <- find.mle(lik, p)
             fit$lnLik
             if (fit$lnLik > threshold) {
@@ -101,3 +101,76 @@ t <- completeTrees[[1]][[1]]
 plot(t)
 ape::write.tree(t, file = paste(file.path("trees", "musse" , "musse_tree_"), 0, ".txt", sep=""))
 ape::write.tree(tree_musse_simulations[[i]], file = paste("/trees/musse/musse_tree_", 0, ".nwk", sep=""))
+
+
+
+
+
+
+
+# for each tree, i want to guess the model that generated it (bd, musse, bisse, geosse, classe)
+# i will use the likelihood of the model to do that
+
+# load the trees: for each model there is a file with a lot of trees (bd.nwk, musse.nwk, bisse.nwk, geosse.nwk, classe_2.nwk)
+# store in a list the correct model for each tree (the name of the file is the model)
+# store in a list the trees
+# store in a list the targets (the correct model for each tree)
+
+# load the trees
+trees <- list()
+models <- c("bd", "musse", "bisse", "geosse", "classe_2")
+for(model in models){
+    cat("Loading ", model, " trees\n")
+    trees[[model]] <- read.tree(paste("trees", paste(model, "_min.nwk", sep=""), sep="/"))
+    cat("Loaded ", length(trees[[model]]), " trees\n")
+}
+
+# store the correct model for each tree
+targets <- c()
+for(model in models){
+    targets <- c(targets, rep(model, length(trees[[model]])))
+}
+
+# store the trees
+all_trees <- c()
+for(model in models){
+    all_trees <- c(all_trees, trees[[model]])
+}
+
+# for each tree, i want to guess the model that generated it (bd, musse, bisse, geosse, classe)
+# i will use the likelihood of the model to do that (make.bd, make.musse, make.bisse, make.geosse, make.classe)
+
+diversitree_functions <- list(make.bd, make.musse, make.bisse, make.geosse, make.classe)
+#diversitree_starting_points <- list(starting.point.bd, starting.point.musse, starting.point.bisse, starting.point.geosse, starting.point.classe)
+predictions <- list()
+for(i in 1:length(all_trees)){
+    tree <- all_trees[[i]]
+    likelihoods <- c()
+    for(j in 1:length(diversitree_functions)){
+        states <- tree$tip.state
+        cat("States: ", states, "\n")
+        if (model == "classe_2"){
+            lik <- make.classe(tree, tree$tip.state, k = 2)
+        }
+        else if (model == "musse"){
+            lik <- make.musse(tree, tree$tip.state, k = 3)
+        }
+        else{
+            lik <- diversitree_functions[[j]](tree, tree$tip.state)
+        }
+    }
+    predictions[[i]] <- likelihoods
+
+}
+
+# get the model with the highest likelihood
+predictions <- sapply(predictions, function(x) which.max(x))
+predictions <- sapply(predictions, function(x) models[x])
+predictions
+
+# get the accuracy
+accuracy <- sum(predictions == targets) / length(targets)
+accuracy
+
+# save the results
+save(predictions, accuracy, file = "data/predictions.Rdata")
