@@ -18,14 +18,16 @@ The main purpose of this thesis work is to substitute the slow Maximum Likelihoo
 
 1. **Simulations:** 
     - The `simulations.r` file is used to simulate phylogenetic trees under different models using functions from the diversitree package. The trees are then saved to file for further analysis.
+    -  `ranges.R` is used to get ranges of speciation and extinction rates by making inference with MLE on real data.
 
 2. **Parameter Inference:**
     - In the `ranges.r` file, ranges of parameters for simulating trees are obtained using inference on phylogenetic trees from real-world data.
     - `CDV_full_tree.py` encodes the trees with the CDV representation, preparing them for ML analysis.
-    - In the `AllModels.ipynb` notebook, encoded trees are read, data is managed, and they are input into a Convolutional Neural Network (CNN) created to train it to infer the parameters of the model. The code is universal for all models in the diversitree package.
+    -  `Summary_Statistics.py`  encodes the trees with the SS representation.
+    - In the `AllModels_SS.ipynb` notebook, encoded trees are read, data is managed, and they are input into a Convolutional Neural Network (CNN) created to train it to infer the parameters of the model. The code is universal for all models in the diversitree package.
 
 3. **Model Predictor:**
-    - The `ModelPredictor.ipynb` notebook trains different Neural Networks to try to infer the model given a tree.
+    - The  `ModelPredictor.ipynb` notebook trains different Neural Networks to try to infer the model given a tree. I suggest to look at the SS one because it is always the most updated.
 
 ---
 
