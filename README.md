@@ -4,8 +4,18 @@
 **Date:** February 2024
 
 ---
+<br/>
+<br/>
+<br/>
 
-[![Work in Progress](https://img.shields.io/badge/Work%20in%20Progress-Yes-yellow.svg)](https://shields.io/)
+<a href="/Thesis.pdf" type="application/pdf"> Thesis.pdf </a>
+
+
+
+
+<br/>
+<br/>
+<br/>
 
 
 ## Description
